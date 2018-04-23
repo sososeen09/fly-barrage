@@ -1,35 +1,36 @@
 package com.sososeen09.library;
 
 import android.graphics.Color;
+import android.support.annotation.ColorRes;
 
 public class Barrage {
 
     private String content;
-    private int color;
+    private int textColorRes;
     private boolean showBorder;
-    private int backGroundColor;
+    private int backGroundColorRes;
 
     public Barrage(String content) {
         this(content, R.color.black, false, Color.WHITE);
     }
 
-    public Barrage(String content, int color) {
-        this(content, color, false, Color.WHITE);
+    public Barrage(String content, int textColor) {
+        this(content, textColor, false, Color.WHITE);
     }
 
     public Barrage(String content, boolean showBorder) {
         this(content, R.color.black, showBorder, Color.WHITE);
     }
 
-    public Barrage(String content, int color, int backGroundColor) {
-        this(content, color, false, backGroundColor);
+    public Barrage(String content, int textColor, int backGroundColorRes) {
+        this(content, textColor, false, backGroundColorRes);
     }
 
-    private Barrage(String content, int color, boolean showBorder, int backGroundColor) {
+    private Barrage(String content, int textColor, boolean showBorder, int backGroundColorRes) {
         this.content = content;
-        this.color = color;
+        this.textColorRes = textColor;
         this.showBorder = showBorder;
-        this.backGroundColor = backGroundColor;
+        this.backGroundColorRes = backGroundColorRes;
     }
 
     public boolean isShowBorder() {
@@ -48,19 +49,19 @@ public class Barrage {
         this.content = content;
     }
 
-    public int getColor() {
-        return color;
+    public int getTextColor() {
+        return textColorRes;
     }
 
-    public void setColor(int color) {
-        this.color = color;
+    public void setTextColor(@ColorRes int textColor) {
+        this.textColorRes = textColor;
     }
 
-    public int getBackGroundColor() {
-        return backGroundColor;
+    public int getBackGroundColorRes() {
+        return backGroundColorRes;
     }
 
-    public void setBackGroundColor(int backGroundColor) {
-        this.backGroundColor = backGroundColor;
+    public void setBackGroundColorRes(@ColorRes int backGroundColorRes) {
+        this.backGroundColorRes = backGroundColorRes;
     }
 }

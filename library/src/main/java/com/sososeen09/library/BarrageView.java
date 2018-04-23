@@ -1,15 +1,15 @@
 package com.sososeen09.library;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -19,14 +19,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.sososeen09.library.SizeUtils.getScreenWidth;
+import static com.sososeen09.library.Utils.getScreenWidth;
+import static com.sososeen09.library.Utils.tintDrawable;
 
 /**
  * Created by shiwei on 2017/8/2.
  */
 
 public class BarrageView extends RelativeLayout {
+    public static final String TAG = "BarrageView";
     private Set<Integer> existMarginValues = new HashSet<>();
     private int linesCount;
 
@@ -57,6 +61,8 @@ public class BarrageView extends RelativeLayout {
     private List<Barrage> barrages = new ArrayList<>();
     private List<Barrage> cache = new ArrayList<>();
     private BarrageProvider barrageProvider;
+    private BlockingQueue<TextView> textViewPools = new LinkedBlockingQueue<>();
+    private BlockingQueue<TextView> bodarTextViewPools = new LinkedBlockingQueue<>();
 
     public BarrageView(Context context) {
         this(context, null);
@@ -70,19 +76,20 @@ public class BarrageView extends RelativeLayout {
         super(context, attrs, defStyleAttr);
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BarrageView, 0, 0);
         try {
-            textLeftPadding = typedArray.getInt(R.styleable.BarrageView_text_left_padding, DEFAULT_PADDING);
-            textRightPadding = typedArray.getInt(R.styleable.BarrageView_text_right_padding, DEFAULT_PADDING);
-            textTopPadding = typedArray.getInt(R.styleable.BarrageView_text_top_padding, DEFAULT_PADDING);
-            textBottomPadding = typedArray.getInt(R.styleable.BarrageView_text_bottom_padding, DEFAULT_PADDING);
+            textLeftPadding = typedArray.getDimensionPixelSize(R.styleable.BarrageView_text_left_padding, DEFAULT_PADDING);
+            textRightPadding = typedArray.getDimensionPixelSize(R.styleable.BarrageView_text_right_padding, DEFAULT_PADDING);
+            textTopPadding = typedArray.getDimensionPixelSize(R.styleable.BarrageView_text_top_padding, DEFAULT_PADDING);
+            textBottomPadding = typedArray.getDimensionPixelSize(R.styleable.BarrageView_text_bottom_padding, DEFAULT_PADDING);
             maxBarrageSize = typedArray.getInt(R.styleable.BarrageView_size, DEFAULT_BARRAGESIZE);
-            maxTextSize = typedArray.getInt(R.styleable.BarrageView_max_text_size, DEFAULT_MAXTEXTSIZE);
-            minTextSize = typedArray.getInt(R.styleable.BarrageView_min_text_size, DEFAULT_MINTEXTSIZE);
-            lineHeight = typedArray.getDimensionPixelSize(R.styleable.BarrageView_line_height, SizeUtils.dp2px(context, DEFAULT_LINEHEIGHT));
+            maxTextSize = typedArray.getDimensionPixelSize(R.styleable.BarrageView_max_text_size, DEFAULT_MAXTEXTSIZE);
+            minTextSize = typedArray.getDimensionPixelSize(R.styleable.BarrageView_min_text_size, DEFAULT_MINTEXTSIZE);
+            lineHeight = typedArray.getDimensionPixelSize(R.styleable.BarrageView_line_height, Utils.dp2px(context, DEFAULT_LINEHEIGHT));
             borderColor = typedArray.getColor(R.styleable.BarrageView_border_color, DEFAULT_BORDERCOLOR);
             random_color = typedArray.getBoolean(R.styleable.BarrageView_random_color, DEFAULT_RANDOMCOLOR);
             allow_repeat = typedArray.getBoolean(R.styleable.BarrageView_allow_repeat, DEFAULT_ALLOWREPEAT);
-            if (SizeUtils.px2sp(context, lineHeight) < maxTextSize)
-                maxTextSize = SizeUtils.px2sp(context, lineHeight);
+            if (Utils.px2sp(context, lineHeight) < maxTextSize) {
+                maxTextSize = Utils.px2sp(context, lineHeight);
+            }
         } finally {
             typedArray.recycle();
         }
@@ -120,30 +127,44 @@ public class BarrageView extends RelativeLayout {
         int index = (int) (Math.random() * barrages.size());
         Barrage barrage = barrages.get(index);
         if (allow_repeat) {
-            if (cache.contains(barrage))
+            if (cache.contains(barrage)) {
                 return;
+            }
             cache.add(barrage);
         }
         showBarrage(barrage);
     }
 
     private void showBarrage(final Barrage tb) {
-        if (linesCount != 0 && getChildCount() >= linesCount)
+        if (linesCount != 0 && getChildCount() >= linesCount) {
             return;
-        if (getChildCount() >= maxBarrageSize)
+        }
+        if (getChildCount() >= maxBarrageSize) {
             return;
-        final TextView textView;
-        if (barrageProvider == null) {
-            textView = tb.isShowBorder() ? new BorderTextView(getContext(), borderColor) : new TextView(getContext());
-            Drawable drawable = textView.getContext().getResources().getDrawable(R.drawable.shape_bg_round);
-            textView.setBackgroundDrawable(tintDrawable(drawable, tb.getBackGroundColor()));
-            textView.setPadding(textLeftPadding, textTopPadding, textRightPadding, textBottomPadding);
+        }
+        TextView textView;
 
-            textView.setTextSize((int) (minTextSize + (maxTextSize - minTextSize) * Math.random()));
-            textView.setTextColor(random_color ? Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256)) : getResources().getColor(tb.getColor()));
-
+        //先从缓存中获取
+        if (tb.isShowBorder()) {
+            textView = bodarTextViewPools.poll();
         } else {
-            textView = barrageProvider.createBarrage(tb);
+            textView = textViewPools.poll();
+        }
+
+        if (textView == null) {
+            if (barrageProvider == null) {
+                textView = tb.isShowBorder() ? new BorderTextView(getContext(), borderColor) : new TextView(getContext());
+                Drawable drawable = textView.getContext().getResources().getDrawable(R.drawable.shape_bg_round);
+                textView.setBackgroundDrawable(tintDrawable(drawable,  ContextCompat.getColor(getContext(), tb.getBackGroundColorRes())));
+                textView.setPadding(textLeftPadding, textTopPadding, textRightPadding, textBottomPadding);
+
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (minTextSize + (maxTextSize - minTextSize) * Math.random()));
+                textView.setTextColor(random_color ? Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256)) : ContextCompat.getColor(getContext(), tb.getTextColor()));
+
+            } else {
+                textView = barrageProvider.createBarrage(tb);
+            }
+            Log.e(TAG, "createBarrage: ");
         }
 
         textView.setText(tb.getContent());
@@ -157,6 +178,7 @@ public class BarrageView extends RelativeLayout {
         params.topMargin = verticalMargin;
         textView.setLayoutParams(params);
         Animation anim = AnimationHelper.createTranslateAnim(getContext(), leftMargin, -getScreenWidth(getContext()));
+        final TextView finalTextView = textView;
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -164,11 +186,18 @@ public class BarrageView extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Log.i("111111", "onAnimationEnd: ");
+                Log.i(TAG, "onAnimationEnd: ");
                 if (allow_repeat)
                     cache.remove(tb);
-                removeView(textView);
-                int verticalMargin = (int) textView.getTag();
+                removeView(finalTextView);
+
+                //加入缓存
+                if (finalTextView instanceof BorderTextView) {
+                    bodarTextViewPools.offer(finalTextView);
+                } else {
+                    textViewPools.offer(finalTextView);
+                }
+                int verticalMargin = (int) finalTextView.getTag();
                 existMarginValues.remove(verticalMargin);
             }
 
@@ -200,19 +229,18 @@ public class BarrageView extends RelativeLayout {
         }
     }
 
+
     public void destroy() {
+        release();
+    }
+
+    private void release() {
         if (mHandler.hasMessages(0))
             mHandler.removeMessages(0);
         barrages.clear();
         cache.clear();
     }
 
-    private Drawable tintDrawable(Drawable drawable, int color) {
-        ColorStateList colors = ColorStateList.valueOf(color);
-        Drawable wrappedDrawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTintList(wrappedDrawable, colors);
-        return wrappedDrawable;
-    }
 
     public void setBarrageProvider(BarrageProvider barrageProvider) {
         this.barrageProvider = barrageProvider;
