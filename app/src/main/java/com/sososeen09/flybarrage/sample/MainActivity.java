@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
         barrageView.setBarrages(mBarrages);
 //        barrageView.setBarrageProvider(this);
 
-        List<Barrage> barrages = new ArrayList<>();
+        final List<Barrage> barrages = new ArrayList<>();
         for (String s : defaultMessage) {
             barrages.add(new Barrage(s, R.color.white, rainbow[random.nextInt(rainbow.length)]));
         }
@@ -64,6 +64,15 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
             public void onClick(View v) {
                 int color = ContextCompat.getColor(MainActivity.this, rainbow[random.nextInt(rainbow.length)]);
                 barrageView.addBarrage(new Barrage("111111111111", R.color.white, rainbow[random.nextInt(rainbow.length)]));
+            }
+        });
+
+        findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                barrageView.removeAllViews();
+                barrageView.destroy();
+                barrageView.setBarrages(barrages);
             }
         });
     }

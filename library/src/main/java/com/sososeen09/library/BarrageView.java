@@ -101,6 +101,7 @@ public class BarrageView extends RelativeLayout {
         if (!list.isEmpty()) {
             barrages.clear();
             barrages.addAll(list);
+            existMarginValues.clear();
             mHandler.sendEmptyMessageDelayed(0, INTERVAL);
         }
     }
@@ -246,6 +247,7 @@ public class BarrageView extends RelativeLayout {
         mHandler.removeCallbacksAndMessages(null);
         barrages.clear();
         cache.clear();
+        existMarginValues.clear();
     }
 
 

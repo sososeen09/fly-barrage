@@ -15,6 +15,14 @@
         android:layout_marginTop="16dp"
         android:text="添加一条弹幕"/>
 
+    <Button
+        android:id="@+id/refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="16dp"
+        android:text="刷新"/>
+
     <com.sososeen09.library.BarrageView
         android:id="@+id/barrageView"
         android:layout_width="match_parent"
