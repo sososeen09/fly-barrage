@@ -32,6 +32,19 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
             R.color.colorPrimaryDark
     };
 
+    String[] defaultMessage = {
+            "defaultMessage1",
+            "defaultMessage2",
+            "defaultMessage3",
+            "defaultMessage4",
+            "defaultMessage5",
+            "defaultMessage6",
+            "defaultMessage7",
+            "defaultMessage8",
+            "defaultMessage9",
+            "defaultMessage10"
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,11 +52,18 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
         barrageView = (BarrageView) findViewById(R.id.barrageView);
         barrageView.setBarrages(mBarrages);
 //        barrageView.setBarrageProvider(this);
+
+        List<Barrage> barrages = new ArrayList<>();
+        for (String s : defaultMessage) {
+            barrages.add(new Barrage(s, R.color.white, rainbow[random.nextInt(rainbow.length)]));
+        }
+
+        barrageView.setBarrages(barrages);
         findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int color = ContextCompat.getColor(MainActivity.this, rainbow[random.nextInt(rainbow.length)]);
-                barrageView.addBarrage(new Barrage("111111111111",R.color.white, rainbow[random.nextInt(rainbow.length)]));
+                barrageView.addBarrage(new Barrage("111111111111", R.color.white, rainbow[random.nextInt(rainbow.length)]));
             }
         });
     }

@@ -18,7 +18,7 @@
     <com.sososeen09.library.BarrageView
         android:id="@+id/barrageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="150dp"
         android:layout_above="@+id/send"
         app:allow_repeat="true"
         app:border_color="@color/colorAccent"
@@ -27,10 +27,10 @@
         app:min_text_size="10sp"
         app:random_color="false"
         app:size="200"
-        app:text_bottom_padding="5dp"
+        app:text_bottom_padding="2dp"
         app:text_left_padding="10dp"
         app:text_right_padding="10dp"
-        app:text_top_padding="5dp"/>
+        app:text_top_padding="2dp"/>
 
 
 </RelativeLayout>

@@ -64,6 +64,8 @@ public class BarrageView extends RelativeLayout {
     private BlockingQueue<TextView> textViewPools = new LinkedBlockingQueue<>();
     private BlockingQueue<TextView> bodarTextViewPools = new LinkedBlockingQueue<>();
 
+
+
     public BarrageView(Context context) {
         this(context, null);
     }
@@ -124,8 +126,8 @@ public class BarrageView extends RelativeLayout {
     };
 
     public void checkBarrage() {
-        int index = (int) (Math.random() * barrages.size());
-        Barrage barrage = barrages.get(index);
+//        int index = (int) (Math.random() * barrages.size());
+        Barrage barrage = barrages.get(random.nextInt(barrages.size()));
         if (allow_repeat) {
             if (cache.contains(barrage)) {
                 return;
@@ -155,7 +157,7 @@ public class BarrageView extends RelativeLayout {
             if (barrageProvider == null) {
                 textView = tb.isShowBorder() ? new BorderTextView(getContext(), borderColor) : new TextView(getContext());
                 Drawable drawable = textView.getContext().getResources().getDrawable(R.drawable.shape_bg_round);
-                textView.setBackgroundDrawable(tintDrawable(drawable,  ContextCompat.getColor(getContext(), tb.getBackGroundColorRes())));
+                textView.setBackgroundDrawable(tintDrawable(drawable, ContextCompat.getColor(getContext(), tb.getBackGroundColorRes())));
                 textView.setPadding(textLeftPadding, textTopPadding, textRightPadding, textBottomPadding);
 
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (minTextSize + (maxTextSize - minTextSize) * Math.random()));
@@ -209,6 +211,12 @@ public class BarrageView extends RelativeLayout {
         addView(textView);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+
+    }
+
     private int getRandomTopMargin() {
         if (validHeightSpace == 0) {
             validHeightSpace = getBottom() - getTop() - getPaddingTop() - getPaddingBottom();
@@ -235,8 +243,7 @@ public class BarrageView extends RelativeLayout {
     }
 
     private void release() {
-        if (mHandler.hasMessages(0))
-            mHandler.removeMessages(0);
+        mHandler.removeCallbacksAndMessages(null);
         barrages.clear();
         cache.clear();
     }
