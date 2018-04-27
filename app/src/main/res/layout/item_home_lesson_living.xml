@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_root"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:background="#666666"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp">
+
+    <com.sososeen09.library.BarrageView
+        android:id="@+id/barrageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        app:allow_repeat="true"
+        app:border_color="@color/colorAccent"
+        app:line_height="18dp"
+        app:max_text_size="10sp"
+        app:min_text_size="10sp"
+        app:random_color="false"
+        app:size="10"
+        app:text_bottom_padding="2dp"
+        app:text_left_padding="3dp"
+        app:text_right_padding="3dp"
+        app:text_top_padding="2dp"/>
+
+</RelativeLayout>

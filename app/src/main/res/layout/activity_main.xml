@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -23,6 +25,14 @@
         android:layout_marginTop="16dp"
         android:text="刷新"/>
 
+    <Button
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="16dp"
+        android:text="list"/>
+
     <com.sososeen09.library.BarrageView
         android:id="@+id/barrageView"
         android:layout_width="match_parent"
@@ -41,4 +51,4 @@
         app:text_top_padding="2dp"/>
 
 
-</RelativeLayout>
+</LinearLayout>

@@ -1,5 +1,6 @@
 package com.sososeen09.flybarrage.sample;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -73,6 +74,13 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
                 barrageView.removeAllViews();
                 barrageView.destroy();
                 barrageView.setBarrages(barrages);
+            }
+        });
+
+        findViewById(R.id.list).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, RecyclerViewActivity.class));
             }
         });
     }

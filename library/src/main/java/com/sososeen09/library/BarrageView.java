@@ -1,16 +1,17 @@
 package com.sososeen09.library;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.animation.Animation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -65,7 +66,6 @@ public class BarrageView extends RelativeLayout {
     private BlockingQueue<TextView> bodarTextViewPools = new LinkedBlockingQueue<>();
 
 
-
     public BarrageView(Context context) {
         this(context, null);
     }
@@ -102,9 +102,17 @@ public class BarrageView extends RelativeLayout {
             barrages.clear();
             barrages.addAll(list);
             existMarginValues.clear();
-            mHandler.sendEmptyMessageDelayed(0, INTERVAL);
+            post(mRunnable);
         }
     }
+
+    @NonNull
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mHandler.sendEmptyMessageDelayed(0, INTERVAL);
+        }
+    };
 
     public void addBarrage(Barrage tb) {
         barrages.add(tb);
@@ -180,36 +188,50 @@ public class BarrageView extends RelativeLayout {
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params.topMargin = verticalMargin;
         textView.setLayoutParams(params);
-        Animation anim = AnimationHelper.createTranslateAnim(getContext(), leftMargin, -getScreenWidth(getContext()));
         final TextView finalTextView = textView;
-        anim.setAnimationListener(new Animation.AnimationListener() {
+
+        Animator translateXAnimator = AnimationHelper.createTranslateXAnimator(getContext(), textView, leftMargin, -getScreenWidth(getContext()));
+        translateXAnimator.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(Animation animation) {
+            public void onAnimationStart(Animator animation) {
+                Log.i(TAG, "onAnimationStart: ");
             }
 
             @Override
-            public void onAnimationEnd(Animation animation) {
+            public void onAnimationEnd(Animator animation) {
                 Log.i(TAG, "onAnimationEnd: ");
-                if (allow_repeat)
-                    cache.remove(tb);
-                removeView(finalTextView);
-
-                //加入缓存
-                if (finalTextView instanceof BorderTextView) {
-                    bodarTextViewPools.offer(finalTextView);
-                } else {
-                    textViewPools.offer(finalTextView);
-                }
-                int verticalMargin = (int) finalTextView.getTag();
-                existMarginValues.remove(verticalMargin);
+                updateCached(tb, finalTextView);
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
+            public void onAnimationCancel(Animator animation) {
+                Log.i(TAG, "onAnimationCancel: ");
+                updateCached(tb, finalTextView);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
             }
         });
-        textView.startAnimation(anim);
+
+        translateXAnimator.start();
         addView(textView);
+    }
+
+    private void updateCached(Barrage tb, TextView finalTextView) {
+        if (allow_repeat)
+            cache.remove(tb);
+        removeView(finalTextView);
+
+        //加入缓存
+        if (finalTextView instanceof BorderTextView) {
+            bodarTextViewPools.offer(finalTextView);
+        } else {
+            textViewPools.offer(finalTextView);
+        }
+        int verticalMargin = (int) finalTextView.getTag();
+        existMarginValues.remove(verticalMargin);
     }
 
     @Override
