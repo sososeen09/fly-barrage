@@ -125,17 +125,19 @@ public class BarrageView extends RelativeLayout {
         }
     }
 
-    Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            if (barrages.isEmpty()) {
+                return;
+            }
             checkBarrage();
             sendEmptyMessageDelayed(0, INTERVAL);
         }
     };
 
     public void checkBarrage() {
-//        int index = (int) (Math.random() * barrages.size());
         Barrage barrage = barrages.get(random.nextInt(barrages.size()));
         if (allow_repeat) {
             if (cache.contains(barrage)) {
@@ -220,8 +222,9 @@ public class BarrageView extends RelativeLayout {
     }
 
     private void updateCached(Barrage tb, TextView finalTextView) {
-        if (allow_repeat)
+        if (allow_repeat) {
             cache.remove(tb);
+        }
         removeView(finalTextView);
 
         //加入缓存
@@ -251,7 +254,7 @@ public class BarrageView extends RelativeLayout {
             }
         }
         while (true) {
-            int randomIndex = (int) (Math.random() * linesCount);
+            int randomIndex = random.nextInt(linesCount);
             int marginValue = randomIndex * (validHeightSpace / linesCount);
             if (!existMarginValues.contains(marginValue)) {
                 existMarginValues.add(marginValue);
@@ -260,9 +263,16 @@ public class BarrageView extends RelativeLayout {
         }
     }
 
-
     public void destroy() {
         release();
+    }
+
+    public void pause() {
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+    public void resume() {
+        post(mRunnable);
     }
 
     private void release() {
@@ -271,7 +281,6 @@ public class BarrageView extends RelativeLayout {
         cache.clear();
         existMarginValues.clear();
     }
-
 
     public void setBarrageProvider(BarrageProvider barrageProvider) {
         this.barrageProvider = barrageProvider;

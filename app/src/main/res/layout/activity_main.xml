@@ -26,6 +26,24 @@
         android:text="刷新"/>
 
     <Button
+        android:id="@+id/pause"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="16dp"
+        android:text="暂停"/>
+
+    <Button
+        android:id="@+id/resume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="16dp"
+        android:text="重新开始"/>
+
+
+
+    <Button
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

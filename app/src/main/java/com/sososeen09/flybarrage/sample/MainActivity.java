@@ -83,6 +83,20 @@ public class MainActivity extends AppCompatActivity implements BarrageProvider {
                 startActivity(new Intent(MainActivity.this, RecyclerViewActivity.class));
             }
         });
+
+        findViewById(R.id.pause).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                barrageView.pause();
+            }
+        });
+
+        findViewById(R.id.resume).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                barrageView.resume();
+            }
+        });
     }
 
     @Override
