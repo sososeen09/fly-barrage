@@ -3,10 +3,12 @@ package com.sososeen09.library;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -17,7 +19,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -64,7 +68,10 @@ public class BarrageView extends RelativeLayout {
     private BarrageProvider barrageProvider;
     private BlockingQueue<TextView> textViewPools = new LinkedBlockingQueue<>();
     private BlockingQueue<TextView> bodarTextViewPools = new LinkedBlockingQueue<>();
-
+    private boolean mShowFps=true;
+    private LinkedList<Long> mDrawTimes;
+    private static final int MAX_RECORD_SIZE = 50;
+    private static final int ONE_SECOND = 1000;
 
     public BarrageView(Context context) {
         this(context, null);
@@ -95,6 +102,8 @@ public class BarrageView extends RelativeLayout {
         } finally {
             typedArray.recycle();
         }
+
+        setWillNotDraw(false);
     }
 
     public void setBarrages(List<Barrage> list) {
@@ -238,10 +247,33 @@ public class BarrageView extends RelativeLayout {
     }
 
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (mShowFps) {
+            String fps = String.format(Locale.getDefault(),
+                    "fps %.2f", fps());
+            DrawHelper.drawFPS(canvas, fps);
+        }
     }
+
+    private float fps() {
+        if (mDrawTimes == null) {
+            mDrawTimes = new LinkedList<>();
+        }
+        long lastTime = SystemClock.uptimeMillis();
+        mDrawTimes.addLast(lastTime);
+        Long first = mDrawTimes.peekFirst();
+        if (first == null) {
+            return 0.0f;
+        }
+        float dtime = lastTime - first;
+        int frames = mDrawTimes.size();
+        if (frames > MAX_RECORD_SIZE) {
+            mDrawTimes.removeFirst();
+        }
+        return dtime > 0 ? mDrawTimes.size() * ONE_SECOND / dtime : 0.0f;
+    }
+
 
     private int getRandomTopMargin() {
         if (validHeightSpace == 0) {
