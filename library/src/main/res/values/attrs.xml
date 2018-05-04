@@ -13,6 +13,8 @@
         <attr name="border_color" format="color"/>
         <attr name="random_color" format="boolean"/>
         <attr name="allow_repeat" format="boolean"/>
+        <!--速度，默认的是对应的是一个屏幕宽度是3000秒-->
+        <attr name="duration" format="integer"/>
     </declare-styleable>
 
 </resources>

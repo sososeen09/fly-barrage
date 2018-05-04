@@ -17,9 +17,9 @@ public class AnimationHelper {
         return tlAnim;
     }
 
-    public static Animator createTranslateXAnimator(Context context, View target, int fromX, int toX) {
+    public static Animator createTranslateXAnimator(Context context, View target, int fromX, int toX, long wholeScreenDuration) {
         ObjectAnimator ranslationX = ObjectAnimator.ofFloat(target, "translationX", fromX, toX);
-        long duration = (long) (Math.abs(toX - fromX) * 1.0f / Utils.getScreenWidth(context) * 3000);
+        long duration = (long) (Math.abs(toX - fromX) * 1.0f / Utils.getScreenWidth(context) * wholeScreenDuration);
         ranslationX.setDuration(duration);
         ranslationX.setInterpolator(new DecelerateAccelerateInterpolator());
 

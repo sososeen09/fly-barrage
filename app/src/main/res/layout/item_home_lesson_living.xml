@@ -27,6 +27,7 @@
         app:size="10"
         app:text_bottom_padding="2dp"
         app:text_left_padding="3dp"
+        app:duration="8000"
         app:text_right_padding="3dp"
         app:text_top_padding="2dp"/>
 

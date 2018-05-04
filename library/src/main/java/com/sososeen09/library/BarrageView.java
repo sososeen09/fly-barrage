@@ -32,6 +32,8 @@ import static com.sososeen09.library.Utils.tintDrawable;
 
 public class BarrageView extends RelativeLayout {
     public static final String TAG = "BarrageView";
+    private int DEFAULT_DURATION=3000;
+    private int wholeScreenDuration;
     private Set<Integer> existMarginValues = new HashSet<>();
     private int linesCount;
 
@@ -89,6 +91,7 @@ public class BarrageView extends RelativeLayout {
             borderColor = typedArray.getColor(R.styleable.BarrageView_border_color, DEFAULT_BORDERCOLOR);
             random_color = typedArray.getBoolean(R.styleable.BarrageView_random_color, DEFAULT_RANDOMCOLOR);
             allow_repeat = typedArray.getBoolean(R.styleable.BarrageView_allow_repeat, DEFAULT_ALLOWREPEAT);
+            wholeScreenDuration = typedArray.getInt(R.styleable.BarrageView_duration, DEFAULT_DURATION);
             if (Utils.px2sp(context, lineHeight) < maxTextSize) {
                 maxTextSize = Utils.px2sp(context, lineHeight);
             }
@@ -192,7 +195,7 @@ public class BarrageView extends RelativeLayout {
         textView.setLayoutParams(params);
         final TextView finalTextView = textView;
 
-        Animator translateXAnimator = AnimationHelper.createTranslateXAnimator(getContext(), textView, leftMargin, -getScreenWidth(getContext()));
+        Animator translateXAnimator = AnimationHelper.createTranslateXAnimator(getContext(), textView, leftMargin, -getScreenWidth(getContext()), wholeScreenDuration);
         translateXAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
